@@ -940,20 +940,20 @@ function render() {
   drawPattern(mCtx, 290, 628, currentPattern, currentPalette, seed);
 }
 
-function exportImage(w, h, label) {
-  const modal = document.getElementById('modal');
-  const img = document.getElementById('modalImg');
-  const info = document.getElementById('modalInfo');
-  img.src = '';
-  info.textContent = 'Gerando ' + w + ' x ' + h + ' ...';
-  modal.classList.add('active');
-  requestAnimationFrame(() => {
-    const c = document.createElement('canvas');
-    c.width = w; c.height = h;
-    drawPattern(c.getContext('2d'), w, h, currentPattern, currentPalette, seed);
-    img.src = c.toDataURL('image/png');
-    info.textContent = label + '  ·  ' + w + ' x ' + h + ' px';
-  });
+function exportImage(w, h, filename) {
+  const c = document.createElement('canvas');
+  c.width = w; c.height = h;
+  drawPattern(c.getContext('2d'), w, h, currentPattern, currentPalette, seed);
+  c.toBlob(function(blob) {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(function() { URL.revokeObjectURL(url); }, 1000);
+  }, 'image/png');
 }
 
 document.getElementById('modal').addEventListener('click', function(e) {
@@ -987,11 +987,11 @@ document.getElementById('btnLight').onclick = () => {
 };
 
 document.getElementById('btnDesktop').onclick = () => {
-  exportImage(DESKTOP_W, DESKTOP_H, 'Desktop 4K');
+  exportImage(DESKTOP_W, DESKTOP_H, 'wllpr-desktop-4k.png');
 };
 
 document.getElementById('btnMobile').onclick = () => {
-  exportImage(MOBILE_W, MOBILE_H, 'iPhone');
+  exportImage(MOBILE_W, MOBILE_H, 'wllpr-iphone.png');
 };
 
 buildStyleGrid();
