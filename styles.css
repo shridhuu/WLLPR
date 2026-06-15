@@ -573,3 +573,12 @@ canvas {
     flex-direction: column !important;
   }
 }
+
+/* --- CRITICAL ZOOM PREVENTION & APP LOCKS --- */
+    html, body {
+      width: 100%;
+      overflow-x: hidden;
+      /* Stops iOS safari and Chrome from bouncing/scaling on multi-touch gestures */
+      touch-action: pan-x pan-y;
+      -webkit-text-size-adjust: 100%;
+    }
