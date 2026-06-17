@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WLLPR — Criar</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%23111'/><text x='16' y='21' text-anchor='middle' font-family='-apple-system,Helvetica,Arial,sans-serif' font-size='13' font-weight='600' fill='white'>WPR</text></svg>">
+  <link rel="stylesheet" href="../styles.css">
+  <style>
+    .create-layout {
+      display: grid;
+      grid-template-columns: 1fr 300px;
+      gap: 24px;
+      padding: 24px;
+      padding-top: 68px;
+      height: 100vh;
+    }
+
+    .preview-area {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .preview-container {
+      display: flex;
+      gap: 20px;
+      align-items: flex-end;
+      justify-content: center;
+    }
+
+    .preview-wrap {
+      position: relative;
+    }
+
+    .preview-label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 1px;
+      color: var(--text-muted);
+      text-align: center;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+    }
+
+    .preview-wrap canvas {
+      border-radius: 16px;
+      border: 2px solid var(--border);
+      display: block;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+    }
+
+    .controls-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      overflow-y: auto;
+      padding-right: 4px;
+      padding-top: 44px;
+    }
+
+    .control-group {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .control-label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+    }
+
+    .style-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+
+    .style-btn {
+      background: var(--bg-card);
+      border: 2px solid var(--border);
+      border-radius: var(--radius);
+      padding: 4px;
+      cursor: pointer;
+      transition: var(--transition);
+      overflow: hidden;
+    }
+
+    .style-btn canvas {
+      width: 100%;
+      aspect-ratio: 16 / 10;
+      border-radius: 10px;
+      display: block;
+    }
+
+    .style-btn:hover { border-color: var(--text-muted); }
+    .style-btn.active { border-color: var(--text); }
+
+    .palette-row {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .palette-swatch {
+      width: 36px;
+      height: 36px;
+      border-radius: 50px;
+      border: 2px solid var(--border);
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      transition: var(--transition);
+      padding: 0;
+      background: none;
+    }
+
+    .palette-swatch span {
+      flex: 1;
+      display: block;
+    }
+
+    .palette-swatch:hover { border-color: var(--text-muted); }
+    .palette-swatch.active { border-color: var(--text); }
+
+    .mode-toggle {
+      display: flex;
+      gap: 6px;
+    }
+
+    .mode-btn {
+      flex: 1;
+      padding: 10px;
+      border-radius: 50px;
+      border: 1px solid var(--border);
+      background: var(--bg-card);
+      color: var(--text-muted);
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: var(--transition);
+    }
+
+    .mode-btn:hover { border-color: var(--text-muted); color: var(--text); }
+    .mode-btn.active { background: var(--text); color: var(--bg); border-color: var(--text); }
+
+    .mode-icon {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+    }
+
+    .mode-icon-dark { background: #222; border: 1px solid #555; }
+    .mode-icon-light { background: #eee; border: 1px solid #ccc; }
+
+    .btn-shuffle {
+      width: 100%;
+      padding: 12px;
+      border-radius: 50px;
+      border: 1px solid var(--border);
+      background: var(--bg-card);
+      color: var(--text);
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 1px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: var(--transition);
+    }
+
+    .btn-shuffle:hover { background: var(--bg-hover); border-color: var(--text-muted); }
+
+    .export-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: auto;
+      padding-top: 12px;
+      border-top: 1px solid var(--border);
+    }
+
+    .btn-export {
+      width: 100%;
+      padding: 12px;
+      border-radius: 50px;
+      border: none;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: var(--transition);
+    }
+
+    .btn-desktop { background: var(--text); color: var(--bg); }
+    .btn-desktop:hover { opacity: 0.85; }
+    .btn-mobile { background: var(--bg-card); color: var(--text); border: 1px solid var(--border) !important; }
+    .btn-mobile:hover { background: var(--bg-hover); }
+
+    .btn-apply {
+      width: 100%;
+      padding: 10px 20px;
+      border-radius: 50px;
+      border: none;
+      background: var(--text);
+      color: var(--bg);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: var(--transition);
+      white-space: nowrap;
+    }
+
+    .btn-apply:hover { opacity: 0.85; }
+    .btn-apply:disabled { opacity: 0.6; cursor: default; }
+
+    .size-hint {
+      font-size: 11px;
+      color: var(--text-muted);
+      text-align: center;
+      margin-top: -4px;
+    }
+  </style>
+</head>
+<body>
+
+<nav data-tauri-drag-region>
+  <div class="nav-tabs">
+    <a href="dist/index.html" class="nav-tab active" title="Home">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M2 8l6-5.5L14 8"/><path d="M3.5 7v5.5a1 1 0 0 0 1 1h7a1 1 0 0 0 1-1V7"/>
+      </svg>
+    </a>
+    <a href="index.html" class="nav-tab" title="Criar">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M8 3v10M3 8h10"/>
+      </svg>
+    </a>
+  </div>
+
+  <div class="nav-actions">
+    <div class="nav-tabs">
+      <button class="nav-tab active" id="themeDark" title="Escuro" style="border: none; cursor: pointer;">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+          <path d="M7 1a6 6 0 1 0 0 12A4.5 4.5 0 0 1 7 1z"/>
+        </svg>
+      </button>
+      <button class="nav-tab" id="themeLight" title="Claro" style="border: none; cursor: pointer;">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+          <circle cx="7" cy="7" r="3"/>
+          <path d="M7 1v1.5M7 12.5V14M1 7h1.5M12.5 7H14M2.8 2.8l1 1M10.2 10.2l1 1M2.8 11.2l1-1M10.2 3.8l1-1"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<main>
+  <div class="create-layout">
+    <div class="preview-area">
+      <div class="preview-container">
+        <div class="preview-wrap">
+          <div class="preview-label">Desktop 4K</div>
+          <canvas id="previewDesktop" width="640" height="360"></canvas>
+        </div>
+        <div class="preview-wrap">
+          <div class="preview-label">iPhone</div>
+          <canvas id="previewMobile" width="145" height="314"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <div class="controls-panel">
+      <div class="control-group">
+        <div class="control-label">Padrão</div>
+        <div class="style-grid" id="styleGrid"></div>
+      </div>
+
+      <div class="control-group">
+        <div class="control-label">Paleta</div>
+        <div class="palette-row" id="paletteRow"></div>
+      </div>
+
+      <div class="control-group">
+        <div class="control-label">Modo</div>
+        <div class="mode-toggle">
+          <button class="mode-btn active" id="btnDark">
+            <span class="mode-icon mode-icon-dark"></span>
+            Escuro
+          </button>
+          <button class="mode-btn" id="btnLight">
+            <span class="mode-icon mode-icon-light"></span>
+            Claro
+          </button>
+        </div>
+      </div>
+
+      <div class="control-group">
+        <button class="btn-shuffle" id="btnShuffle">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="23 4 23 10 17 10"></polyline>
+            <polyline points="1 20 1 14 7 14"></polyline>
+            <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+          </svg>
+          GERAR VARIAÇÃO
+        </button>
+      </div>
+
+      <div class="export-group">
+        <button class="btn-apply" id="btnApply">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+            <rect x="2" y="2" width="12" height="12" rx="2" stroke="currentColor" stroke-width="1.5"/>
+            <path d="M2 11l3-3 2 2 4-4 3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          Definir Papel de Parede
+        </button>
+
+        <button class="btn-export btn-desktop" id="btnDesktop">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="12" height="9" rx="1"/><path d="M5 15h6M8 12v3"/></svg>
+          Baixar Desktop
+        </button>
+        <div class="size-hint">3840 × 2160 px</div>
+
+        <button class="btn-export btn-mobile" id="btnMobile">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="1" width="8" height="14" rx="2"/><path d="M7.5 12.5h1"/></svg>
+          Baixar iPhone
+        </button>
+        <div class="size-hint">1290 × 2796 px</div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script type="module">
+  function applyTheme(isDark) {
+    const r = document.documentElement.style;
+    if (isDark) {
+      r.setProperty('--bg', '#0a0a0a');
+      r.setProperty('--bg-card', '#151515');
+      r.setProperty('--bg-hover', '#1e1e1e');
+      r.setProperty('--bg-nav', 'rgba(15,15,15,0.85)');
+      r.setProperty('--text', '#f0f0f0');
+      r.setProperty('--text-muted', '#888');
+      r.setProperty('--border', '#222');
+    } else {
+      r.setProperty('--bg', '#f0f0f0');
+      r.setProperty('--bg-card', '#ffffff');
+      r.setProperty('--bg-hover', '#e4e4e4');
+      r.setProperty('--bg-nav', 'rgba(240,240,240,0.85)');
+      r.setProperty('--text', '#111');
+      r.setProperty('--text-muted', '#666');
+      r.setProperty('--border', '#ddd');
+    }
+  }
+
+  const saved = localStorage.getItem('wllpr-theme') || 'dark';
+  applyTheme(saved === 'dark');
+  if (saved === 'light') {
+    document.getElementById('themeLight').classList.add('active');
+    document.getElementById('themeDark').classList.remove('active');
+  }
+
+  document.getElementById('themeDark').onclick = () => {
+    localStorage.setItem('wllpr-theme', 'dark');
+    applyTheme(true);
+    document.getElementById('themeDark').classList.add('active');
+    document.getElementById('themeLight').classList.remove('active');
+  };
+
+  document.getElementById('themeLight').onclick = () => {
+    localStorage.setItem('wllpr-theme', 'light');
+    applyTheme(false);
+    document.getElementById('themeLight').classList.add('active');
+    document.getElementById('themeDark').classList.remove('active');
+  };
+</script>
+<script type="module" src="../js/create.js"></script>
+</body>
+</html>
