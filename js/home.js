@@ -1,5 +1,5 @@
-import { wallpapers, getFeatured, PATTERN_SECTIONS } from './wallpapers.js?v=9';
-import { drawPattern, PALETTES, PATTERN_LABELS } from './engine.js?v=9';
+import { wallpapers, getFeatured, PATTERN_SECTIONS } from './wallpapers.js?v=10';
+import { drawPattern, PALETTES, PATTERN_LABELS } from './engine.js?v=10';
 
 const THUMB_W = 320;
 const THUMB_H = 200;

@@ -938,9 +938,10 @@ export function drawClockOverlay(ctx, w, h, type, paletteIdx, inv) {
     ctx.font = '600 42px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto';
     ctx.fillText(time, w / 2, h * 0.30);
   } else if (type === 'mobile') {
-    ctx.font = '500 7px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto';
+    const fScale = w / 145;
+    ctx.font = `500 ${Math.round(7 * fScale)}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto`;
     ctx.fillText(dateStr.toUpperCase(), w / 2, h * 0.15);
-    ctx.font = '700 28px -apple-system, BlinkMacSystemFont, "SF Pro Display", Roboto';
+    ctx.font = `700 ${Math.round(28 * fScale)}px -apple-system, BlinkMacSystemFont, "SF Pro Display", Roboto`;
     ctx.fillText(time, w / 2, h * 0.23);
   }
 }

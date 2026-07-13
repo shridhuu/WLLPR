@@ -1,4 +1,4 @@
-import { drawPattern, drawClockOverlay, exportWallpaper, registerPalette, PALETTES, PATTERNS, PATTERN_LABELS, DESKTOP_W, DESKTOP_H, MOBILE_W, MOBILE_H } from './engine.js?v=9';
+import { drawPattern, drawClockOverlay, exportWallpaper, registerPalette, PALETTES, PATTERNS, PATTERN_LABELS, DESKTOP_W, DESKTOP_H, MOBILE_W, MOBILE_H } from './engine.js?v=10';
 
 let currentPattern = 0;
 let currentPalette = 0;
@@ -26,8 +26,8 @@ function render() {
   const dPR = window.devicePixelRatio || 2;
   const dWidth = 640;
   const dHeight = 360;
-  const mWidth = 145;
-  const mHeight = 314;
+  const mWidth = 320;
+  const mHeight = 693;
   
   dCanvas.width = dWidth * dPR;
   dCanvas.height = dHeight * dPR;

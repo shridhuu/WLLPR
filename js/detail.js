@@ -1,5 +1,5 @@
-import { wallpapers, getWallpaper } from './wallpapers.js?v=9';
-import { drawPattern, exportWallpaper, PALETTES, PATTERN_LABELS, DESKTOP_W, DESKTOP_H, MOBILE_W, MOBILE_H } from './engine.js?v=9';
+import { wallpapers, getWallpaper } from './wallpapers.js?v=10';
+import { drawPattern, exportWallpaper, PALETTES, PATTERN_LABELS, DESKTOP_W, DESKTOP_H, MOBILE_W, MOBILE_H } from './engine.js?v=10';
 
 const params = new URLSearchParams(window.location.search);
 const id = params.get('id');
