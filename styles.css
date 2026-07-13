@@ -576,3 +576,61 @@ button.nav-tab {
   background: transparent;
   cursor: pointer;
 }
+
+@media (max-width: 600px) {
+  nav {
+    padding: 0.5rem 1rem;
+    height: auto;
+    background: var(--bg-nav);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+  }
+  .nav-tabs, .theme-tabs {
+    padding: 2px;
+    gap: 0.25rem;
+  }
+  .nav-tab, .theme-tab {
+    padding: 4px 12px;
+    font-size: 11px;
+  }
+  
+  .featured {
+    height: 50vh;
+  }
+  .featured-overlay {
+    padding: 16px;
+  }
+  .featured-title {
+    font-size: 22px;
+  }
+  .featured-badge {
+    font-size: 9px;
+  }
+  .btn {
+    padding: 8px 18px;
+    font-size: 12px;
+  }
+  
+  .section {
+    padding: 20px 16px;
+  }
+  .section-title {
+    font-size: 15px;
+  }
+  .section-subtitle {
+    font-size: 11px;
+  }
+  .carousel {
+    padding: 0 16px;
+    gap: 8px;
+  }
+  .carousel-item {
+    width: 120px;
+  }
+  
+  footer {
+    padding: 24px 16px;
+    font-size: 11px;
+  }
+}
