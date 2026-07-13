@@ -1,4 +1,4 @@
-import { drawPattern, drawClockOverlay, exportWallpaper, registerPalette, PALETTES, PATTERNS, PATTERN_LABELS, DESKTOP_W, DESKTOP_H, MOBILE_W, MOBILE_H } from './engine.js?v=10';
+import { drawPattern, drawClockOverlay, exportWallpaper, registerPalette, PALETTES, PATTERNS, PATTERN_LABELS, DESKTOP_W, DESKTOP_H, MOBILE_W, MOBILE_H } from './engine.js?v=11';
 
 let currentPattern = 0;
 let currentPalette = 0;
@@ -19,35 +19,79 @@ const btnMixPalette = document.getElementById('btnMixPalette');
 inputSeed.value = seed;
 sliderSeed.value = seed % 10000;
 
-function render() {
-  const dCanvas = document.getElementById('previewDesktop');
-  const mCanvas = document.getElementById('previewMobile');
-  
+let dCache = document.createElement('canvas');
+let mCache = document.createElement('canvas');
+let dCacheValid = false;
+let mCacheValid = false;
+
+function renderBackground() {
   const dPR = window.devicePixelRatio || 2;
   const dWidth = 640;
   const dHeight = 360;
   const mWidth = 320;
   const mHeight = 693;
-  
+
+  dCache.width = dWidth * dPR;
+  dCache.height = dHeight * dPR;
+  mCache.width = mWidth * dPR;
+  mCache.height = mHeight * dPR;
+
+  const dCtx = dCache.getContext('2d');
+  const mCtx = mCache.getContext('2d');
+
+  dCtx.scale(dPR, dPR);
+  mCtx.scale(dPR, dPR);
+
+  drawPattern(dCtx, dWidth, dHeight, currentPattern, currentPalette, seed, inverted, currentScale, currentComplexity);
+  drawPattern(mCtx, mWidth, mHeight, currentPattern, currentPalette, seed, inverted, currentScale, currentComplexity);
+
+  dCacheValid = true;
+  mCacheValid = true;
+}
+
+function updateClock() {
+  if (!dCacheValid || !mCacheValid) {
+    renderBackground();
+  }
+
+  const dCanvas = document.getElementById('previewDesktop');
+  const mCanvas = document.getElementById('previewMobile');
+  if (!dCanvas || !mCanvas) return;
+
+  const dPR = window.devicePixelRatio || 2;
+  const dWidth = 640;
+  const dHeight = 360;
+  const mWidth = 320;
+  const mHeight = 693;
+
   dCanvas.width = dWidth * dPR;
   dCanvas.height = dHeight * dPR;
   mCanvas.width = mWidth * dPR;
   mCanvas.height = mHeight * dPR;
-  
+
   const dCtx = dCanvas.getContext('2d');
   const mCtx = mCanvas.getContext('2d');
-  
-  dCtx.setTransform(1, 0, 0, 1, 0, 0);
-  mCtx.setTransform(1, 0, 0, 1, 0, 0);
-  
+
   dCtx.scale(dPR, dPR);
   mCtx.scale(dPR, dPR);
-  
-  drawPattern(dCtx, dWidth, dHeight, currentPattern, currentPalette, seed, inverted, currentScale, currentComplexity);
-  drawPattern(mCtx, mWidth, mHeight, currentPattern, currentPalette, seed, inverted, currentScale, currentComplexity);
+
+  // Draw the pre-rendered pattern background
+  dCtx.drawImage(dCache, 0, 0, dWidth, dHeight);
+  mCtx.drawImage(mCache, 0, 0, mWidth, mHeight);
+
+  // Draw clock overlay
   drawClockOverlay(dCtx, dWidth, dHeight, 'desktop', currentPalette, inverted);
   drawClockOverlay(mCtx, mWidth, mHeight, 'mobile', currentPalette, inverted);
 }
+
+function render() {
+  dCacheValid = false;
+  mCacheValid = false;
+  updateClock();
+}
+
+// Update clock text every 10 seconds
+setInterval(updateClock, 10000);
 
 // Pattern grid
 const grid = document.getElementById('styleGrid');
