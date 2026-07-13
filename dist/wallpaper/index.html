@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -227,7 +227,7 @@
 </div>
 
 <!-- Back button -->
-<a href="../index.html" class="viewer-back">
+<a href="../" class="viewer-back">
   <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10 3L4 8l6 5"/></svg>
 </a>
 
@@ -251,7 +251,7 @@
   <div class="bar-actions">
     <!-- Download button with dropdown -->
     <div style="position: relative;">
-      <button class="bar-icon-btn" id="btnDownload" title="Baixar">
+      <button class="bar-icon-btn" id="btnDownload" title="Download">
         <svg width="15" height="15" viewBox="0 0 16 16" fill="none">
           <path d="M8 2v8M5 7l3 3 3-3M3 12h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
@@ -269,7 +269,7 @@
     </div>
 
     <!-- Set wallpaper -->
-    <button class="bar-set-btn" id="btnSetWallpaper">Definir Papel de Parede</button>
+    <button class="bar-set-btn" id="btnSetWallpaper">Set Wallpaper</button>
   </div>
 </div>
 
@@ -278,16 +278,16 @@
   <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
     <path d="M3.5 8.5l3 3 6-6"/>
   </svg>
-  <span id="toastMsg">Download concluído</span>
+  <span id="toastMsg">Download completed</span>
 </div>
 
-<script type="module" src="../js/wallpapers.js"></script>
-<script type="module" src="../js/detail.js"></script>
+<script type="module" src="../js/wallpapers.js?v=8"></script>
+<script type="module" src="../js/detail.js?v=8"></script>
 <script>
   window.showToast = function(msg) {
     const toast = document.getElementById('toast');
     const toastMsg = document.getElementById('toastMsg');
-    toastMsg.textContent = msg || 'Download concluído';
+    toastMsg.textContent = msg || 'Download completed';
     toast.classList.add('show');
     clearTimeout(window._toastTimer);
     window._toastTimer = setTimeout(() => toast.classList.remove('show'), 2500);

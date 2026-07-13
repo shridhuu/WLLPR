@@ -1,5 +1,5 @@
-import { wallpapers, getFeatured, PATTERN_SECTIONS } from './wallpapers.js';
-import { drawPattern, PALETTES, PATTERN_LABELS } from './engine.js';
+import { wallpapers, getFeatured, PATTERN_SECTIONS } from './wallpapers.js?v=8';
+import { drawPattern, PALETTES, PATTERN_LABELS } from './engine.js?v=8';
 
 const THUMB_W = 320;
 const THUMB_H = 200;
@@ -11,6 +11,35 @@ function renderToCanvas(wp, w, h) {
   c.width = w;
   c.height = h;
   drawPattern(c.getContext('2d'), w, h, wp.pattern, wp.palette, wp.seed, wp.inverted);
+  return c;
+}
+
+// Lazy rendering observer to prevent page load lag
+const lazyObserver = new IntersectionObserver((entries, observer) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      const canvas = entry.target;
+      const wp = JSON.parse(canvas.dataset.wp);
+      drawPattern(canvas.getContext('2d'), THUMB_W, THUMB_H, wp.pattern, wp.palette, wp.seed, wp.inverted);
+      canvas.removeAttribute('data-wp');
+      observer.unobserve(canvas);
+    }
+  });
+}, {
+  rootMargin: '120px 200px'
+});
+
+function renderToCanvasLazy(wp, w, h) {
+  const c = document.createElement('canvas');
+  c.width = w;
+  c.height = h;
+  c.dataset.wp = JSON.stringify({
+    pattern: wp.pattern,
+    palette: wp.palette,
+    seed: wp.seed,
+    inverted: wp.inverted
+  });
+  lazyObserver.observe(c);
   return c;
 }
 
@@ -27,8 +56,8 @@ document.getElementById('featuredImg').replaceWith(heroCanvas);
 
 document.getElementById('featuredTitle').textContent = featured.name;
 document.getElementById('featuredMeta').textContent =
-  `${PATTERN_LABELS[featured.pattern]} · ${PALETTES[featured.palette].name} · ${featured.inverted ? 'Claro' : 'Escuro'}`;
-document.getElementById('featuredLink').href = `wallpaper/index.html?id=${featured.id}`;
+  `${PATTERN_LABELS[featured.pattern]} · ${PALETTES[featured.palette].name} · ${featured.inverted ? 'Light' : 'Dark'}`;
+document.getElementById('featuredLink').href = `wallpaper/?id=${featured.id}`;
 
 // Pattern-grouped carousel sections
 const sectionsContainer = document.getElementById('sectionsContainer');
@@ -67,7 +96,7 @@ PATTERN_SECTIONS.forEach(section => {
     const card = document.createElement('div');
     card.className = 'carousel-card';
 
-    const c = renderToCanvas(wp, THUMB_W, THUMB_H);
+    const c = renderToCanvasLazy(wp, THUMB_W, THUMB_H);
     c.style.width = '100%';
     c.style.height = '100%';
     card.appendChild(c);
@@ -77,13 +106,13 @@ PATTERN_SECTIONS.forEach(section => {
     overlay.innerHTML = `
       <div class="wall-card-info">
         <div class="wall-card-name">${wp.name}</div>
-        <div class="wall-card-res">${PALETTES[wp.palette].name} · ${wp.inverted ? 'Claro' : 'Escuro'}</div>
+        <div class="wall-card-res">${PALETTES[wp.palette].name} · ${wp.inverted ? 'Light' : 'Dark'}</div>
       </div>
     `;
     card.appendChild(overlay);
 
     card.addEventListener('click', () => {
-      window.location.href = `wallpaper/index.html?id=${wp.id}`;
+      window.location.href = `wallpaper/?id=${wp.id}`;
     });
     carousel.appendChild(card);
   });

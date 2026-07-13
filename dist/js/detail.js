@@ -1,12 +1,12 @@
-import { wallpapers, getWallpaper } from './wallpapers.js';
-import { drawPattern, exportWallpaper, PALETTES, PATTERN_LABELS, DESKTOP_W, DESKTOP_H, MOBILE_W, MOBILE_H } from './engine.js';
+import { wallpapers, getWallpaper } from './wallpapers.js?v=8';
+import { drawPattern, exportWallpaper, PALETTES, PATTERN_LABELS, DESKTOP_W, DESKTOP_H, MOBILE_W, MOBILE_H } from './engine.js?v=8';
 
 const params = new URLSearchParams(window.location.search);
 const id = params.get('id');
 const wp = getWallpaper(id);
 
 if (!wp) {
-  window.location.href = '../index.html';
+  window.location.href = '../';
 }
 
 // Render fullscreen canvas
@@ -49,11 +49,11 @@ document.getElementById('btnDownloadMobile').addEventListener('click', () => {
 document.getElementById('btnSetWallpaper').addEventListener('click', async () => {
   try {
     if (!window.__TAURI__) {
-      alert('Funcionalidade disponível apenas no app desktop.');
+      alert('Feature available only in the desktop application.');
       return;
     }
     const btn = document.getElementById('btnSetWallpaper');
-    btn.textContent = 'Aplicando...';
+    btn.textContent = 'Applying...';
     btn.disabled = true;
 
     const c = document.createElement('canvas');
@@ -69,16 +69,16 @@ document.getElementById('btnSetWallpaper').addEventListener('click', async () =>
     });
 
     await new Promise(r => setTimeout(r, 5000));
-    btn.textContent = 'Aplicado!';
+    btn.textContent = 'Applied!';
 
     setTimeout(() => {
-      btn.textContent = 'Definir Papel de Parede';
+      btn.textContent = 'Set Wallpaper';
       btn.disabled = false;
     }, 2000);
   } catch (err) {
-    alert('Erro: ' + err);
+    alert('Error: ' + err);
     const btn = document.getElementById('btnSetWallpaper');
-    btn.textContent = 'Definir Papel de Parede';
+    btn.textContent = 'Set Wallpaper';
     btn.disabled = false;
   }
 });

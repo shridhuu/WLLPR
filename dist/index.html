@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -36,7 +36,7 @@
         <path d="M2 8l6-5.5L14 8"/><path d="M3.5 7v5.5a1 1 0 0 0 1 1h7a1 1 0 0 0 1-1V7"/>
       </svg>
     </a>
-    <a href="create/index.html" class="nav-tab" title="Criar">
+    <a href="create/" class="nav-tab" title="Create">
       <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
         <path d="M8 3v10M3 8h10"/>
       </svg>
@@ -45,12 +45,12 @@
 
   <div class="nav-actions">
     <div class="theme-tabs">
-      <button class="theme-tab active" id="themeDark" title="Escuro" style="border: none; cursor: pointer;">
+      <button class="theme-tab active" id="themeDark" title="Dark" style="border: none; cursor: pointer;">
         <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
           <path d="M7 1a6 6 0 1 0 0 12A4.5 4.5 0 0 1 7 1z"/>
         </svg>
       </button>
-      <button class="theme-tab" id="themeLight" title="Claro" style="border: none; cursor: pointer;">
+      <button class="theme-tab" id="themeLight" title="Light" style="border: none; cursor: pointer;">
         <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
           <circle cx="7" cy="7" r="3"/>
           <path d="M7 1v1.5M7 12.5V14M1 7h1.5M12.5 7H14M2.8 2.8l1 1M10.2 10.2l1 1M2.8 11.2l1-1M10.2 3.8l1-1"/>
@@ -65,14 +65,14 @@
   <div class="featured" id="featuredHero">
     <img id="featuredImg" src="" alt="Featured wallpaper">
     <div class="featured-overlay">
-      <div class="featured-badge">DESTAQUE</div>
+      <div class="featured-badge">FEATURED</div>
       <div class="featured-title" id="featuredTitle"></div>
       <div class="featured-meta" id="featuredMeta"></div>
       <div class="featured-actions">
         <a id="featuredLink" href="#">
           <button class="btn btn-primary">
             <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 1l6 6-6 6"/></svg>
-            Ver Papel de Parede
+            View Wallpaper
           </button>
         </a>
       </div>
@@ -84,8 +84,8 @@
 </main>
 
 <footer>
-  Criado por
-  <a href="https://www.instagram.com/pedro___neres/" target="_blank" rel="noopener">@pedro___neres</a>
+  Created by
+  <a href="https://github.com/shridhuu" target="_blank" rel="noopener">@shridhuu</a>
 </footer>
 
 <script type="module">
@@ -131,6 +131,6 @@
     document.getElementById('themeDark').classList.remove('active');
   };
 </script>
-<script type="module" src="js/home.js"></script>
+<script type="module" src="js/home.js?v=8"></script>
 </body>
 </html>

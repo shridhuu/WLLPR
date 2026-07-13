@@ -1,15 +1,29 @@
-import { drawPattern, drawClockOverlay, exportWallpaper, PALETTES, PATTERNS, PATTERN_LABELS, DESKTOP_W, DESKTOP_H, MOBILE_W, MOBILE_H } from './engine.js';
+import { drawPattern, drawClockOverlay, exportWallpaper, registerPalette, PALETTES, PATTERNS, PATTERN_LABELS, DESKTOP_W, DESKTOP_H, MOBILE_W, MOBILE_H } from './engine.js?v=8';
 
 let currentPattern = 0;
 let currentPalette = 0;
 let seed = Math.random() * 10000 | 0;
 let inverted = false;
+let currentScale = 1.0;
+let currentComplexity = 1.0;
+
+const inputSeed = document.getElementById('inputSeed');
+const sliderSeed = document.getElementById('sliderSeed');
+const sliderScale = document.getElementById('sliderScale');
+const labelScale = document.getElementById('labelScale');
+const sliderComplexity = document.getElementById('sliderComplexity');
+const labelComplexity = document.getElementById('labelComplexity');
+const btnMixPalette = document.getElementById('btnMixPalette');
+
+// Set initial slider & inputs values
+inputSeed.value = seed;
+sliderSeed.value = seed % 10000;
 
 function render() {
   const dCtx = document.getElementById('previewDesktop').getContext('2d');
   const mCtx = document.getElementById('previewMobile').getContext('2d');
-  drawPattern(dCtx, 640, 360, currentPattern, currentPalette, seed, inverted);
-  drawPattern(mCtx, 145, 314, currentPattern, currentPalette, seed, inverted);
+  drawPattern(dCtx, 640, 360, currentPattern, currentPalette, seed, inverted, currentScale, currentComplexity);
+  drawPattern(mCtx, 145, 314, currentPattern, currentPalette, seed, inverted, currentScale, currentComplexity);
   drawClockOverlay(dCtx, 640, 360, 'desktop', currentPalette, inverted);
   drawClockOverlay(mCtx, 145, 314, 'mobile', currentPalette, inverted);
 }
@@ -25,7 +39,12 @@ PATTERNS.forEach((_, i) => {
   c.height = 75;
   btn.appendChild(c);
   grid.appendChild(btn);
-  drawPattern(c.getContext('2d'), 120, 75, i, 0, 42, false);
+  
+  // Stagger rendering to prevent blocking creator page load
+  setTimeout(() => {
+    drawPattern(c.getContext('2d'), 120, 75, i, 0, 42, false, 1.0, 1.0);
+  }, i * 15);
+
   btn.onclick = () => {
     currentPattern = i;
     grid.querySelectorAll('.style-btn').forEach(b => b.classList.remove('active'));
@@ -34,14 +53,16 @@ PATTERNS.forEach((_, i) => {
   };
 });
 
-// Palette row
+// Palette row renderer
 const row = document.getElementById('paletteRow');
-PALETTES.forEach((pal, i) => {
+function addPaletteSwatch(pal, i) {
   const swatch = document.createElement('button');
   swatch.className = 'palette-swatch' + (i === currentPalette ? ' active' : '');
   swatch.title = pal.name;
-  const colors = pal.colors;
-  swatch.style.background = pal.colors[Math.floor(pal.colors.length / 2)];
+  const c1 = pal.colors[0];
+  const c2 = pal.colors[Math.floor(pal.colors.length / 2)];
+  const c3 = pal.colors[pal.colors.length - 1];
+  swatch.style.background = `linear-gradient(to right, ${c1} 33%, ${c2} 33%, ${c2} 67%, ${c3} 67%)`;
   row.appendChild(swatch);
   swatch.onclick = () => {
     currentPalette = i;
@@ -49,7 +70,90 @@ PALETTES.forEach((pal, i) => {
     swatch.classList.add('active');
     render();
   };
+}
+
+PALETTES.forEach((pal, i) => {
+  addPaletteSwatch(pal, i);
 });
+
+// HSL to Hex helper for custom mixer
+function hslToHex(h, s, l) {
+  s /= 100;
+  l /= 100;
+  let c = (1 - Math.abs(2 * l - 1)) * s,
+      x = c * (1 - Math.abs((h / 60) % 2 - 1)),
+      m = l - c/2,
+      r = 0, g = 0, b = 0;
+  if (0 <= h && h < 60) { r = c; g = x; b = 0; }
+  else if (60 <= h && h < 120) { r = x; g = c; b = 0; }
+  else if (120 <= h && h < 180) { r = 0; g = c; b = x; }
+  else if (180 <= h && h < 240) { r = 0; g = x; b = c; }
+  else if (240 <= h && h < 300) { r = x; g = 0; b = c; }
+  else if (300 <= h && h < 360) { r = c; g = 0; b = x; }
+  const toHex = val => {
+    const hex = Math.round((val + m) * 255).toString(16);
+    return hex.length === 1 ? '0' + hex : hex;
+  };
+  return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
+}
+
+function generateCustomPalette() {
+  const baseHue = Math.random() * 360;
+  const isAnalogous = Math.random() > 0.5;
+  const colors = [];
+  for (let i = 0; i < 10; i++) {
+    const t = i / 9;
+    let h, s, l;
+    if (isAnalogous) {
+      h = (baseHue + t * 60 - 30 + 360) % 360;
+      s = 65 + t * 25; 
+      l = 15 + t * 70;
+    } else {
+      h = (baseHue + (t > 0.5 ? 180 : 0) + 360) % 360;
+      s = 55 + t * 35;
+      l = 15 + t * 70;
+    }
+    colors.push(hslToHex(h, s, l));
+  }
+  return { name: `Custom Mix`, colors };
+}
+
+// Mix Palette action
+btnMixPalette.onclick = () => {
+  const customPal = generateCustomPalette();
+  const newIndex = registerPalette(customPal.name, customPal.colors);
+  addPaletteSwatch(customPal, newIndex);
+  // Select it
+  currentPalette = newIndex;
+  row.querySelectorAll('.palette-swatch').forEach(b => b.classList.remove('active'));
+  row.lastElementChild.classList.add('active');
+  render();
+};
+
+// Seed event bindings
+function updateSeed(val) {
+  seed = parseInt(val) || 0;
+  inputSeed.value = seed;
+  sliderSeed.value = seed % 10000;
+  render();
+}
+
+inputSeed.oninput = (e) => updateSeed(e.target.value);
+sliderSeed.oninput = (e) => updateSeed(e.target.value);
+
+// Scale event bindings
+sliderScale.oninput = (e) => {
+  currentScale = parseFloat(e.target.value);
+  labelScale.textContent = currentScale.toFixed(1) + 'x';
+  render();
+};
+
+// Complexity event bindings
+sliderComplexity.oninput = (e) => {
+  currentComplexity = parseFloat(e.target.value);
+  labelComplexity.textContent = currentComplexity.toFixed(1) + 'x';
+  render();
+};
 
 // Mode toggle
 document.getElementById('btnDark').onclick = () => {
@@ -69,33 +173,35 @@ document.getElementById('btnLight').onclick = () => {
 // Shuffle
 document.getElementById('btnShuffle').onclick = () => {
   seed = Math.random() * 100000 | 0;
+  inputSeed.value = seed;
+  sliderSeed.value = seed % 10000;
   render();
 };
 
 // Download
 document.getElementById('btnDesktop').onclick = () => {
-  exportWallpaper(DESKTOP_W, DESKTOP_H, currentPattern, currentPalette, seed, inverted, 'wllpr-desktop-4k.png');
+  exportWallpaper(DESKTOP_W, DESKTOP_H, currentPattern, currentPalette, seed, inverted, 'wllpr-desktop-4k.png', currentScale, currentComplexity);
 };
 
 document.getElementById('btnMobile').onclick = () => {
-  exportWallpaper(MOBILE_W, MOBILE_H, currentPattern, currentPalette, seed, inverted, 'wllpr-iphone.png');
+  exportWallpaper(MOBILE_W, MOBILE_H, currentPattern, currentPalette, seed, inverted, 'wllpr-iphone.png', currentScale, currentComplexity);
 };
 
 // Apply as wallpaper
 document.getElementById('btnApply').addEventListener('click', async () => {
   try {
     if (!window.__TAURI__) {
-      alert('Funcionalidade disponível apenas no app desktop.');
+      alert('Feature available only in the desktop application.');
       return;
     }
     const btn = document.getElementById('btnApply');
-    btn.textContent = 'Aplicando...';
+    btn.textContent = 'Applying...';
     btn.disabled = true;
 
     const c = document.createElement('canvas');
     c.width = DESKTOP_W;
     c.height = DESKTOP_H;
-    drawPattern(c.getContext('2d'), DESKTOP_W, DESKTOP_H, currentPattern, currentPalette, seed, inverted);
+    drawPattern(c.getContext('2d'), DESKTOP_W, DESKTOP_H, currentPattern, currentPalette, seed, inverted, currentScale, currentComplexity);
     const blob = await new Promise(resolve => c.toBlob(resolve, 'image/png'));
     const arrayBuffer = await blob.arrayBuffer();
     const bytes = Array.from(new Uint8Array(arrayBuffer));
@@ -105,15 +211,15 @@ document.getElementById('btnApply').addEventListener('click', async () => {
     });
 
     await new Promise(r => setTimeout(r, 5000));
-    btn.textContent = 'Aplicado!';
+    btn.textContent = 'Applied!';
     setTimeout(() => {
-      btn.textContent = 'Definir Papel de Parede';
+      btn.textContent = 'Set Wallpaper';
       btn.disabled = false;
     }, 2000);
   } catch (err) {
-    alert('Erro: ' + err);
+    alert('Error: ' + err);
     const btn = document.getElementById('btnApply');
-    btn.textContent = 'Definir Papel de Parede';
+    btn.textContent = 'Set Wallpaper';
     btn.disabled = false;
   }
 });

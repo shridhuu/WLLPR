@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>WLLPR — Criar</title>
+  <title>WLLPR — Create</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%23111'/><text x='16' y='21' text-anchor='middle' font-family='-apple-system,Helvetica,Arial,sans-serif' font-size='13' font-weight='600' fill='white'>WPR</text></svg>">
   <link rel="stylesheet" href="../styles.css">
   <style>
@@ -108,9 +108,9 @@
     }
 
     .palette-swatch {
-      width: 36px;
-      height: 36px;
-      border-radius: 50px;
+      width: 48px;
+      height: 24px;
+      border-radius: 8px;
       border: 2px solid var(--border);
       cursor: pointer;
       display: flex;
@@ -245,12 +245,12 @@
 
 <nav data-tauri-drag-region>
   <div class="nav-tabs">
-    <a href="../index.html" class="nav-tab" title="Home">
+    <a href="../" class="nav-tab" title="Home">
       <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
         <path d="M2 8l6-5.5L14 8"/><path d="M3.5 7v5.5a1 1 0 0 0 1 1h7a1 1 0 0 0 1-1V7"/>
       </svg>
     </a>
-    <a href="index.html" class="nav-tab active" title="Criar">
+    <a href="./" class="nav-tab active" title="Create">
       <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
         <path d="M8 3v10M3 8h10"/>
       </svg>
@@ -259,12 +259,12 @@
 
   <div class="nav-actions">
     <div class="nav-tabs">
-      <button class="nav-tab active" id="themeDark" title="Escuro" style="border: none; cursor: pointer;">
+      <button class="nav-tab active" id="themeDark" title="Dark" style="border: none; cursor: pointer;">
         <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
           <path d="M7 1a6 6 0 1 0 0 12A4.5 4.5 0 0 1 7 1z"/>
         </svg>
       </button>
-      <button class="nav-tab" id="themeLight" title="Claro" style="border: none; cursor: pointer;">
+      <button class="nav-tab" id="themeLight" title="Light" style="border: none; cursor: pointer;">
         <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
           <circle cx="7" cy="7" r="3"/>
           <path d="M7 1v1.5M7 12.5V14M1 7h1.5M12.5 7H14M2.8 2.8l1 1M10.2 10.2l1 1M2.8 11.2l1-1M10.2 3.8l1-1"/>
@@ -291,27 +291,54 @@
 
     <div class="controls-panel">
       <div class="control-group">
-        <div class="control-label">Padrão</div>
+        <div class="control-label">Pattern</div>
         <div class="style-grid" id="styleGrid"></div>
       </div>
 
       <div class="control-group">
-        <div class="control-label">Paleta</div>
+        <div class="control-header-row" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+          <div class="control-label">Palette</div>
+          <button id="btnMixPalette" style="background: transparent; border: 1px solid var(--border); color: var(--text); padding: 4px 10px; border-radius: 50px; font-size: 11px; cursor: pointer; font-weight: 600; text-transform: uppercase; transition: var(--transition);">Mix Palette</button>
+        </div>
         <div class="palette-row" id="paletteRow"></div>
       </div>
 
       <div class="control-group">
-        <div class="control-label">Modo</div>
+        <div class="control-label">Mode</div>
         <div class="mode-toggle">
           <button class="mode-btn active" id="btnDark">
             <span class="mode-icon mode-icon-dark"></span>
-            Escuro
+            Dark
           </button>
           <button class="mode-btn" id="btnLight">
             <span class="mode-icon mode-icon-light"></span>
-            Claro
+            Light
           </button>
         </div>
+      </div>
+
+      <div class="control-group">
+        <div class="control-header-row" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+          <div class="control-label">Variation Seed</div>
+          <input type="number" id="inputSeed" style="width: 70px; background: var(--bg-card); border: 1px solid var(--border); color: var(--text); border-radius: 6px; padding: 2px 6px; font-size: 12px; font-family: monospace; text-align: right;" min="0" max="999999">
+        </div>
+        <input type="range" id="sliderSeed" min="0" max="9999" value="42" style="width: 100%; cursor: pointer;">
+      </div>
+
+      <div class="control-group">
+        <div class="control-header-row" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+          <div class="control-label">Pattern Scale</div>
+          <span id="labelScale" style="font-size: 12px; color: var(--text-muted);">1.0x</span>
+        </div>
+        <input type="range" id="sliderScale" min="0.5" max="2.0" step="0.1" value="1.0" style="width: 100%; cursor: pointer;">
+      </div>
+
+      <div class="control-group">
+        <div class="control-header-row" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+          <div class="control-label">Complexity</div>
+          <span id="labelComplexity" style="font-size: 12px; color: var(--text-muted);">1.0x</span>
+        </div>
+        <input type="range" id="sliderComplexity" min="0.4" max="2.0" step="0.1" value="1.0" style="width: 100%; cursor: pointer;">
       </div>
 
       <div class="control-group">
@@ -321,7 +348,7 @@
             <polyline points="1 20 1 14 7 14"></polyline>
             <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
           </svg>
-          GERAR VARIAÇÃO
+          SHUFFLE VARIATION
         </button>
       </div>
 
@@ -331,18 +358,18 @@
             <rect x="2" y="2" width="12" height="12" rx="2" stroke="currentColor" stroke-width="1.5"/>
             <path d="M2 11l3-3 2 2 4-4 3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
-          Definir Papel de Parede
+          Set Wallpaper
         </button>
 
         <button class="btn-export btn-desktop" id="btnDesktop">
           <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="12" height="9" rx="1"/><path d="M5 15h6M8 12v3"/></svg>
-          Baixar Desktop
+          Download Desktop
         </button>
         <div class="size-hint">3840 × 2160 px</div>
 
         <button class="btn-export btn-mobile" id="btnMobile">
           <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="1" width="8" height="14" rx="2"/><path d="M7.5 12.5h1"/></svg>
-          Baixar iPhone
+          Download iPhone
         </button>
         <div class="size-hint">1290 × 2796 px</div>
       </div>
@@ -393,6 +420,6 @@
     document.getElementById('themeDark').classList.remove('active');
   };
 </script>
-<script type="module" src="../js/create.js"></script>
+<script type="module" src="../js/create.js?v=8"></script>
 </body>
 </html>
