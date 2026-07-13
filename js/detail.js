@@ -1,5 +1,5 @@
-import { wallpapers, getWallpaper } from './wallpapers.js?v=8';
-import { drawPattern, exportWallpaper, PALETTES, PATTERN_LABELS, DESKTOP_W, DESKTOP_H, MOBILE_W, MOBILE_H } from './engine.js?v=8';
+import { wallpapers, getWallpaper } from './wallpapers.js?v=9';
+import { drawPattern, exportWallpaper, PALETTES, PATTERN_LABELS, DESKTOP_W, DESKTOP_H, MOBILE_W, MOBILE_H } from './engine.js?v=9';
 
 const params = new URLSearchParams(window.location.search);
 const id = params.get('id');
@@ -11,9 +11,16 @@ if (!wp) {
 
 // Render fullscreen canvas
 const canvas = document.getElementById('wallpaperCanvas');
-canvas.width = 1920;
-canvas.height = 1080;
-drawPattern(canvas.getContext('2d'), 1920, 1080, wp.pattern, wp.palette, wp.seed, wp.inverted);
+const dPR = window.devicePixelRatio || 2;
+const w = window.innerWidth;
+const h = window.innerHeight;
+canvas.width = w * dPR;
+canvas.height = h * dPR;
+canvas.style.width = `${w}px`;
+canvas.style.height = `${h}px`;
+const ctx = canvas.getContext('2d');
+ctx.scale(dPR, dPR);
+drawPattern(ctx, w, h, wp.pattern, wp.palette, wp.seed, wp.inverted);
 document.title = `WLLPR — ${wp.name}`;
 
 // Bar info

@@ -1,4 +1,4 @@
-import { drawPattern, drawClockOverlay, exportWallpaper, registerPalette, PALETTES, PATTERNS, PATTERN_LABELS, DESKTOP_W, DESKTOP_H, MOBILE_W, MOBILE_H } from './engine.js?v=8';
+import { drawPattern, drawClockOverlay, exportWallpaper, registerPalette, PALETTES, PATTERNS, PATTERN_LABELS, DESKTOP_W, DESKTOP_H, MOBILE_W, MOBILE_H } from './engine.js?v=9';
 
 let currentPattern = 0;
 let currentPalette = 0;
@@ -20,12 +20,33 @@ inputSeed.value = seed;
 sliderSeed.value = seed % 10000;
 
 function render() {
-  const dCtx = document.getElementById('previewDesktop').getContext('2d');
-  const mCtx = document.getElementById('previewMobile').getContext('2d');
-  drawPattern(dCtx, 640, 360, currentPattern, currentPalette, seed, inverted, currentScale, currentComplexity);
-  drawPattern(mCtx, 145, 314, currentPattern, currentPalette, seed, inverted, currentScale, currentComplexity);
-  drawClockOverlay(dCtx, 640, 360, 'desktop', currentPalette, inverted);
-  drawClockOverlay(mCtx, 145, 314, 'mobile', currentPalette, inverted);
+  const dCanvas = document.getElementById('previewDesktop');
+  const mCanvas = document.getElementById('previewMobile');
+  
+  const dPR = window.devicePixelRatio || 2;
+  const dWidth = 640;
+  const dHeight = 360;
+  const mWidth = 145;
+  const mHeight = 314;
+  
+  dCanvas.width = dWidth * dPR;
+  dCanvas.height = dHeight * dPR;
+  mCanvas.width = mWidth * dPR;
+  mCanvas.height = mHeight * dPR;
+  
+  const dCtx = dCanvas.getContext('2d');
+  const mCtx = mCanvas.getContext('2d');
+  
+  dCtx.setTransform(1, 0, 0, 1, 0, 0);
+  mCtx.setTransform(1, 0, 0, 1, 0, 0);
+  
+  dCtx.scale(dPR, dPR);
+  mCtx.scale(dPR, dPR);
+  
+  drawPattern(dCtx, dWidth, dHeight, currentPattern, currentPalette, seed, inverted, currentScale, currentComplexity);
+  drawPattern(mCtx, mWidth, mHeight, currentPattern, currentPalette, seed, inverted, currentScale, currentComplexity);
+  drawClockOverlay(dCtx, dWidth, dHeight, 'desktop', currentPalette, inverted);
+  drawClockOverlay(mCtx, mWidth, mHeight, 'mobile', currentPalette, inverted);
 }
 
 // Pattern grid

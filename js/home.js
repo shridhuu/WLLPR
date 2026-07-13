@@ -1,5 +1,5 @@
-import { wallpapers, getFeatured, PATTERN_SECTIONS } from './wallpapers.js?v=8';
-import { drawPattern, PALETTES, PATTERN_LABELS } from './engine.js?v=8';
+import { wallpapers, getFeatured, PATTERN_SECTIONS } from './wallpapers.js?v=9';
+import { drawPattern, PALETTES, PATTERN_LABELS } from './engine.js?v=9';
 
 const THUMB_W = 320;
 const THUMB_H = 200;
@@ -8,9 +8,14 @@ const HERO_H = 820;
 
 function renderToCanvas(wp, w, h) {
   const c = document.createElement('canvas');
-  c.width = w;
-  c.height = h;
-  drawPattern(c.getContext('2d'), w, h, wp.pattern, wp.palette, wp.seed, wp.inverted);
+  const dPR = window.devicePixelRatio || 2;
+  c.width = w * dPR;
+  c.height = h * dPR;
+  c.style.width = `${w}px`;
+  c.style.height = `${h}px`;
+  const ctx = c.getContext('2d');
+  ctx.scale(dPR, dPR);
+  drawPattern(ctx, w, h, wp.pattern, wp.palette, wp.seed, wp.inverted);
   return c;
 }
 
@@ -20,7 +25,12 @@ const lazyObserver = new IntersectionObserver((entries, observer) => {
     if (entry.isIntersecting) {
       const canvas = entry.target;
       const wp = JSON.parse(canvas.dataset.wp);
-      drawPattern(canvas.getContext('2d'), THUMB_W, THUMB_H, wp.pattern, wp.palette, wp.seed, wp.inverted);
+      const dPR = window.devicePixelRatio || 2;
+      canvas.width = THUMB_W * dPR;
+      canvas.height = THUMB_H * dPR;
+      const ctx = canvas.getContext('2d');
+      ctx.scale(dPR, dPR);
+      drawPattern(ctx, THUMB_W, THUMB_H, wp.pattern, wp.palette, wp.seed, wp.inverted);
       canvas.removeAttribute('data-wp');
       observer.unobserve(canvas);
     }
@@ -31,6 +41,8 @@ const lazyObserver = new IntersectionObserver((entries, observer) => {
 
 function renderToCanvasLazy(wp, w, h) {
   const c = document.createElement('canvas');
+  c.style.width = `${w}px`;
+  c.style.height = `${h}px`;
   c.width = w;
   c.height = h;
   c.dataset.wp = JSON.stringify({
